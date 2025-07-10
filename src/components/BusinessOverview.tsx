@@ -2,32 +2,35 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { TrendingUp, Package, Users, ShoppingCart, DollarSign, AlertTriangle } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export const BusinessOverview = () => {
+  const { t } = useLanguage();
+
   const businessMetrics = [
     {
-      title: "માસિક આવક",
+      title: t('metrics.monthly.income'),
       value: "₹45,230",
       change: "+12.5%",
       trend: "up",
       icon: DollarSign
     },
     {
-      title: "સક્રિય ઓર્ડર",
+      title: t('metrics.active.orders'),
       value: "23",
       change: "+5",
       trend: "up",
       icon: ShoppingCart
     },
     {
-      title: "કુલ ગ્રાહકો",
+      title: t('metrics.total.customers'),
       value: "156",
       change: "+8",
       trend: "up",
       icon: Users
     },
     {
-      title: "ઇન્વેન્ટરી આઇટમ",
+      title: t('metrics.inventory.items'),
       value: "89",
       change: "-3",
       trend: "down",
@@ -36,10 +39,10 @@ export const BusinessOverview = () => {
   ];
 
   const recentOrders = [
-    { id: "ORD-001", customer: "એક્વાટેક સોલ્યુશન્સ", amount: "₹2,450", status: "પ્રોસેસિંગ" },
-    { id: "ORD-002", customer: "ક્લીન વોટર કો.", amount: "₹1,890", status: "મોકલાયેલ" },
-    { id: "ORD-003", customer: "પ્યુર H2O સિસ્ટમ્સ", amount: "₹3,200", status: "પહોંચાડેલ" },
-    { id: "ORD-004", customer: "ફિલ્ટરમેક્સ લિમિટેડ", amount: "₹950", status: "બાકી" }
+    { id: "ORD-001", customer: "એક્વાટેક સોલ્યુશન્સ", amount: "₹2,450", status: t('status.processing') },
+    { id: "ORD-002", customer: "ક્લીન વોટર કો.", amount: "₹1,890", status: t('status.shipped') },
+    { id: "ORD-003", customer: "પ્યુર H2O સિસ્ટમ્સ", amount: "₹3,200", status: t('status.delivered') },
+    { id: "ORD-004", customer: "ફિલ્ટરમેક્સ લિમિટેડ", amount: "₹950", status: t('status.pending') }
   ];
 
   const lowStockItems = [
@@ -49,13 +52,11 @@ export const BusinessOverview = () => {
   ];
 
   const getStatusColor = (status: string) => {
-    switch (status) {
-      case "પહોંચાડેલ": return "bg-green-500/10 text-green-700 border-green-200";
-      case "મોકલાયેલ": return "bg-blue-500/10 text-blue-700 border-blue-200";
-      case "પ્રોસેસિંગ": return "bg-yellow-500/10 text-yellow-700 border-yellow-200";
-      case "બાકી": return "bg-red-500/10 text-red-700 border-red-200";
-      default: return "bg-gray-500/10 text-gray-700 border-gray-200";
-    }
+    if (status === t('status.delivered')) return "bg-green-500/10 text-green-700 border-green-200";
+    if (status === t('status.shipped')) return "bg-blue-500/10 text-blue-700 border-blue-200";
+    if (status === t('status.processing')) return "bg-yellow-500/10 text-yellow-700 border-yellow-200";
+    if (status === t('status.pending')) return "bg-red-500/10 text-red-700 border-red-200";
+    return "bg-gray-500/10 text-gray-700 border-gray-200";
   };
 
   return (
@@ -87,8 +88,8 @@ export const BusinessOverview = () => {
         {/* Recent Orders */}
         <Card>
           <CardHeader>
-            <CardTitle>તાજેતરના ઓર્ડર</CardTitle>
-            <CardDescription>નવીનતમ ગ્રાહક ઓર્ડર અને તેમની સ્થિતિ</CardDescription>
+            <CardTitle>{t('recent.orders')}</CardTitle>
+            <CardDescription>{t('recent.orders.desc')}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -115,9 +116,9 @@ export const BusinessOverview = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <AlertTriangle className="h-5 w-5 text-yellow-600" />
-              ઓછા સ્ટોકની ચેતવણી
+              {t('low.stock.alert')}
             </CardTitle>
-            <CardDescription>ઇન્વેન્ટરીમાં ઓછા સ્ટોક વાળા આઇટમ</CardDescription>
+            <CardDescription>{t('low.stock.desc')}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -130,7 +131,7 @@ export const BusinessOverview = () => {
                     </div>
                   </div>
                   <Badge className="bg-yellow-500/10 text-yellow-700 border-yellow-200">
-                    ઓછો સ્ટોક
+                    {t('status.low.stock')}
                   </Badge>
                 </div>
               ))}
