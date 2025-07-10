@@ -6,28 +6,28 @@ import { TrendingUp, Package, Users, ShoppingCart, DollarSign, AlertTriangle } f
 export const BusinessOverview = () => {
   const businessMetrics = [
     {
-      title: "Monthly Revenue",
-      value: "$45,230",
+      title: "માસિક આવક",
+      value: "₹45,230",
       change: "+12.5%",
       trend: "up",
       icon: DollarSign
     },
     {
-      title: "Active Orders",
+      title: "સક્રિય ઓર્ડર",
       value: "23",
       change: "+5",
       trend: "up",
       icon: ShoppingCart
     },
     {
-      title: "Total Customers",
+      title: "કુલ ગ્રાહકો",
       value: "156",
       change: "+8",
       trend: "up",
       icon: Users
     },
     {
-      title: "Inventory Items",
+      title: "ઇન્વેન્ટરી આઇટમ",
       value: "89",
       change: "-3",
       trend: "down",
@@ -36,24 +36,24 @@ export const BusinessOverview = () => {
   ];
 
   const recentOrders = [
-    { id: "ORD-001", customer: "AquaTech Solutions", amount: "$2,450", status: "processing" },
-    { id: "ORD-002", customer: "Clean Water Co.", amount: "$1,890", status: "shipped" },
-    { id: "ORD-003", customer: "Pure H2O Systems", amount: "$3,200", status: "delivered" },
-    { id: "ORD-004", customer: "FilterMax Ltd.", amount: "$950", status: "pending" }
+    { id: "ORD-001", customer: "એક્વાટેક સોલ્યુશન્સ", amount: "₹2,450", status: "પ્રોસેસિંગ" },
+    { id: "ORD-002", customer: "ક્લીન વોટર કો.", amount: "₹1,890", status: "મોકલાયેલ" },
+    { id: "ORD-003", customer: "પ્યુર H2O સિસ્ટમ્સ", amount: "₹3,200", status: "પહોંચાડેલ" },
+    { id: "ORD-004", customer: "ફિલ્ટરમેક્સ લિમિટેડ", amount: "₹950", status: "બાકી" }
   ];
 
   const lowStockItems = [
-    { name: "5-Stage RO Membrane", current: 5, minimum: 10 },
-    { name: "Carbon Pre-Filter", current: 8, minimum: 15 },
-    { name: "Sediment Filter", current: 12, minimum: 20 }
+    { name: "5-સ્ટેજ આરઓ મેમ્બ્રેન", current: 5, minimum: 10 },
+    { name: "કાર્બન પ્રી-ફિલ્ટર", current: 8, minimum: 15 },
+    { name: "સેડિમેન્ટ ફિલ્ટર", current: 12, minimum: 20 }
   ];
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "delivered": return "bg-green-500/10 text-green-700 border-green-200";
-      case "shipped": return "bg-blue-500/10 text-blue-700 border-blue-200";
-      case "processing": return "bg-yellow-500/10 text-yellow-700 border-yellow-200";
-      case "pending": return "bg-red-500/10 text-red-700 border-red-200";
+      case "પહોંચાડેલ": return "bg-green-500/10 text-green-700 border-green-200";
+      case "મોકલાયેલ": return "bg-blue-500/10 text-blue-700 border-blue-200";
+      case "પ્રોસેસિંગ": return "bg-yellow-500/10 text-yellow-700 border-yellow-200";
+      case "બાકી": return "bg-red-500/10 text-red-700 border-red-200";
       default: return "bg-gray-500/10 text-gray-700 border-gray-200";
     }
   };
@@ -87,8 +87,8 @@ export const BusinessOverview = () => {
         {/* Recent Orders */}
         <Card>
           <CardHeader>
-            <CardTitle>Recent Orders</CardTitle>
-            <CardDescription>Latest customer orders and their status</CardDescription>
+            <CardTitle>તાજેતરના ઓર્ડર</CardTitle>
+            <CardDescription>નવીનતમ ગ્રાહક ઓર્ડર અને તેમની સ્થિતિ</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -115,9 +115,9 @@ export const BusinessOverview = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <AlertTriangle className="h-5 w-5 text-yellow-600" />
-              Low Stock Alert
+              ઓછા સ્ટોકની ચેતવણી
             </CardTitle>
-            <CardDescription>Items running low in inventory</CardDescription>
+            <CardDescription>ઇન્વેન્ટરીમાં ઓછા સ્ટોક વાળા આઇટમ</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -126,11 +126,11 @@ export const BusinessOverview = () => {
                   <div>
                     <div className="font-medium">{item.name}</div>
                     <div className="text-sm text-muted-foreground">
-                      Current: {item.current} | Min: {item.minimum}
+                      વર્તમાન: {item.current} | લઘુત્તમ: {item.minimum}
                     </div>
                   </div>
                   <Badge className="bg-yellow-500/10 text-yellow-700 border-yellow-200">
-                    Low Stock
+                    ઓછો સ્ટોક
                   </Badge>
                 </div>
               ))}

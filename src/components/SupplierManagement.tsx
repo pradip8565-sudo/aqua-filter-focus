@@ -10,68 +10,68 @@ export const SupplierManagement = () => {
   const suppliers = [
     {
       id: "SUP-001",
-      name: "AquaTech Corp",
+      name: "એક્વાટેક કોર્પ",
       email: "supply@aquatechcorp.com",
-      phone: "+1 (800) 123-4567",
-      products: ["RO Systems", "Membranes", "Filters"],
+      phone: "+91 99999 00001",
+      products: ["આરઓ સિસ્ટમ્સ", "મેમ્બ્રેન", "ફિલ્ટર"],
       rating: 4.8,
       orders: 45,
-      totalSpent: "$125,000",
+      totalSpent: "₹12,50,000",
       status: "active",
       lastOrder: "2024-01-15",
-      paymentTerm: "Net 30"
+      paymentTerm: "30 દિવસ"
     },
     {
       id: "SUP-002",
-      name: "FilterPro Ltd",
+      name: "ફિલ્ટરપ્રો લિમિટેડ",
       email: "orders@filterpro.com",
-      phone: "+1 (800) 234-5678",
-      products: ["Membranes", "Carbon Filters"],
+      phone: "+91 88888 00002",
+      products: ["મેમ્બ્રેન", "કાર્બન ફિલ્ટર"],
       rating: 4.5,
       orders: 32,
-      totalSpent: "$89,500",
+      totalSpent: "₹8,95,000",
       status: "active",
       lastOrder: "2024-01-12",
-      paymentTerm: "Net 15"
+      paymentTerm: "15 દિવસ"
     },
     {
       id: "SUP-003",
-      name: "Pure Water Inc",
+      name: "પ્યુર વોટર ઇન્ક",
       email: "sales@purewater.com",
-      phone: "+1 (800) 345-6789",
-      products: ["Pre-Filters", "Post-Filters"],
+      phone: "+91 77777 00003",
+      products: ["પ્રી-ફિલ્ટર", "પોસ્ટ-ફિલ્ટર"],
       rating: 4.2,
       orders: 28,
-      totalSpent: "$67,800",
+      totalSpent: "₹6,78,000",
       status: "active",
       lastOrder: "2024-01-10",
-      paymentTerm: "Net 30"
+      paymentTerm: "30 દિવસ"
     },
     {
       id: "SUP-004",
-      name: "TankMax Co",
+      name: "ટાંકમેક્સ કો",
       email: "info@tankmax.com",
-      phone: "+1 (800) 456-7890",
-      products: ["Storage Tanks", "Pressure Tanks"],
+      phone: "+91 66666 00004",
+      products: ["સ્ટોરેજ ટાંકી", "પ્રેશર ટાંકી"],
       rating: 4.6,
       orders: 18,
-      totalSpent: "$45,200",
+      totalSpent: "₹4,52,000",
       status: "active",
       lastOrder: "2024-01-08",
-      paymentTerm: "Net 45"
+      paymentTerm: "45 દિવસ"
     },
     {
       id: "SUP-005",
-      name: "PumpTech Solutions",
+      name: "પંપટેક સોલ્યુશન્સ",
       email: "contact@pumptech.com",
-      phone: "+1 (800) 567-8901",
-      products: ["Booster Pumps", "Pressure Pumps"],
+      phone: "+91 55555 00005",
+      products: ["બૂસ્ટર પંપ", "પ્રેશર પંપ"],
       rating: 4.4,
       orders: 15,
-      totalSpent: "$38,900",
+      totalSpent: "₹3,89,000",
       status: "active",
       lastOrder: "2024-01-05",
-      paymentTerm: "Net 30"
+      paymentTerm: "30 દિવસ"
     }
   ];
 
@@ -81,6 +81,15 @@ export const SupplierManagement = () => {
       case "inactive": return "bg-red-500/10 text-red-700 border-red-200";
       case "pending": return "bg-yellow-500/10 text-yellow-700 border-yellow-200";
       default: return "bg-gray-500/10 text-gray-700 border-gray-200";
+    }
+  };
+
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case "active": return "સક્રિય";
+      case "inactive": return "નિષ્ક્રિય";
+      case "pending": return "બાકી";
+      default: return status;
     }
   };
 
@@ -100,12 +109,12 @@ export const SupplierManagement = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-foreground">Supplier Management</h2>
-          <p className="text-muted-foreground">Manage your supplier relationships and procurement</p>
+          <h2 className="text-2xl font-bold text-foreground">સપ્લાયર મેનેજમેન્ટ</h2>
+          <p className="text-muted-foreground">તમારા સપ્લાયર સંબંધો અને પ્રોક્યોરમેન્ટનું સંચાલન કરો</p>
         </div>
         <Button>
           <Plus className="h-4 w-4 mr-2" />
-          Add Supplier
+          સપ્લાયર ઉમેરો
         </Button>
       </div>
 
@@ -116,14 +125,14 @@ export const SupplierManagement = () => {
             <div className="relative flex-1">
               <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Search suppliers by name or product type..."
+                placeholder="નામ અથવા પ્રોડક્ટ પ્રકાર દ્વારા સપ્લાયર શોધો..."
                 className="pl-10"
               />
             </div>
             <div className="flex gap-2">
-              <Button variant="outline" size="sm">All</Button>
-              <Button variant="outline" size="sm">Active</Button>
-              <Button variant="outline" size="sm">Top Rated</Button>
+              <Button variant="outline" size="sm">બધા</Button>
+              <Button variant="outline" size="sm">સક્રિય</Button>
+              <Button variant="outline" size="sm">ટોપ રેટેડ</Button>
             </div>
           </div>
         </CardContent>
@@ -134,24 +143,24 @@ export const SupplierManagement = () => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Truck className="h-5 w-5" />
-            Supplier Directory
+            સપ્લાયર ડિરેક્ટરી
           </CardTitle>
-          <CardDescription>Your trusted suppliers and their performance</CardDescription>
+          <CardDescription>તમારા વિશ્વસનીય સપ્લાયર અને તેમની કામગીરી</CardDescription>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Supplier ID</TableHead>
-                <TableHead>Company Name</TableHead>
-                <TableHead>Contact Info</TableHead>
-                <TableHead>Products</TableHead>
-                <TableHead>Rating</TableHead>
-                <TableHead>Orders</TableHead>
-                <TableHead>Total Spent</TableHead>
-                <TableHead>Payment Terms</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Actions</TableHead>
+                <TableHead>સપ્લાયર ID</TableHead>
+                <TableHead>કંપનીનું નામ</TableHead>
+                <TableHead>સંપર્ક માહિતી</TableHead>
+                <TableHead>પ્રોડક્ટ્સ</TableHead>
+                <TableHead>રેટિંગ</TableHead>
+                <TableHead>ઓર્ડર</TableHead>
+                <TableHead>કુલ ખર્ચ</TableHead>
+                <TableHead>પેમેન્ટ ટર્મ</TableHead>
+                <TableHead>સ્થિતિ</TableHead>
+                <TableHead>ક્રિયાઓ</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -161,7 +170,7 @@ export const SupplierManagement = () => {
                   <TableCell>
                     <div className="font-medium">{supplier.name}</div>
                     <div className="text-sm text-muted-foreground">
-                      Last order: {supplier.lastOrder}
+                      છેલ્લો ઓર્ડર: {supplier.lastOrder}
                     </div>
                   </TableCell>
                   <TableCell>
@@ -196,16 +205,16 @@ export const SupplierManagement = () => {
                   <TableCell>{supplier.paymentTerm}</TableCell>
                   <TableCell>
                     <Badge className={getStatusColor(supplier.status)}>
-                      {supplier.status.toUpperCase()}
+                      {getStatusText(supplier.status)}
                     </Badge>
                   </TableCell>
                   <TableCell>
                     <div className="flex gap-2">
                       <Button variant="outline" size="sm">
-                        View
+                        જુઓ
                       </Button>
                       <Button variant="outline" size="sm">
-                        Order
+                        ઓર્ડર
                       </Button>
                     </div>
                   </TableCell>

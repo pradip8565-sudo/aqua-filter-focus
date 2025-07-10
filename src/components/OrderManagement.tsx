@@ -10,50 +10,50 @@ export const OrderManagement = () => {
   const orders = [
     {
       id: "ORD-001",
-      customer: "AquaTech Solutions",
+      customer: "એક્વાટેક સોલ્યુશન્સ",
       date: "2024-01-18",
       items: 5,
-      total: "$2,450.00",
+      total: "₹24,500",
       status: "processing",
       priority: "high",
       estimatedDelivery: "2024-01-22"
     },
     {
       id: "ORD-002",
-      customer: "Clean Water Co.",
+      customer: "ક્લીન વોટર કો.",
       date: "2024-01-17",
       items: 3,
-      total: "$1,890.00",
+      total: "₹18,900",
       status: "shipped",
       priority: "medium",
       estimatedDelivery: "2024-01-20"
     },
     {
       id: "ORD-003",
-      customer: "Pure H2O Systems",
+      customer: "પ્યુર H2O સિસ્ટમ્સ",
       date: "2024-01-16",
       items: 8,
-      total: "$3,200.00",
+      total: "₹32,000",
       status: "delivered",
       priority: "high",
       estimatedDelivery: "2024-01-19"
     },
     {
       id: "ORD-004",
-      customer: "FilterMax Ltd.",
+      customer: "ફિલ્ટરમેક્સ લિમિટેડ",
       date: "2024-01-15",
       items: 2,
-      total: "$950.00",
+      total: "₹9,500",
       status: "pending",
       priority: "low",
       estimatedDelivery: "2024-01-25"
     },
     {
       id: "ORD-005",
-      customer: "Hydro Solutions Inc.",
+      customer: "હાઇડ્રો સોલ્યુશન્સ ઇન્ક.",
       date: "2024-01-14",
       items: 6,
-      total: "$2,180.00",
+      total: "₹21,800",
       status: "confirmed",
       priority: "medium",
       estimatedDelivery: "2024-01-21"
@@ -80,17 +80,37 @@ export const OrderManagement = () => {
     }
   };
 
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case "delivered": return "પહોંચાડેલ";
+      case "shipped": return "મોકલાયેલ";
+      case "processing": return "પ્રોસેસિંગ";
+      case "confirmed": return "પુષ્ટિ";
+      case "pending": return "બાકી";
+      default: return status;
+    }
+  };
+
+  const getPriorityText = (priority: string) => {
+    switch (priority) {
+      case "high": return "ઉચ્ચ";
+      case "medium": return "મધ્યમ";
+      case "low": return "નીચું";
+      default: return priority;
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-foreground">Order Management</h2>
-          <p className="text-muted-foreground">Track and manage customer orders</p>
+          <h2 className="text-2xl font-bold text-foreground">ઓર્ડર મેનેજમેન્ટ</h2>
+          <p className="text-muted-foreground">ગ્રાહક ઓર્ડરનું ટ્રેકિંગ અને સંચાલન કરો</p>
         </div>
         <Button>
           <Plus className="h-4 w-4 mr-2" />
-          New Order
+          નવો ઓર્ડર
         </Button>
       </div>
 
@@ -101,16 +121,16 @@ export const OrderManagement = () => {
             <div className="relative flex-1">
               <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Search orders by ID, customer, or date..."
+                placeholder="ID, ગ્રાહક અથવા તારીખ દ્વારા ઓર્ડર શોધો..."
                 className="pl-10"
               />
             </div>
             <div className="flex gap-2">
-              <Button variant="outline" size="sm">All</Button>
-              <Button variant="outline" size="sm">Pending</Button>
-              <Button variant="outline" size="sm">Processing</Button>
-              <Button variant="outline" size="sm">Shipped</Button>
-              <Button variant="outline" size="sm">Delivered</Button>
+              <Button variant="outline" size="sm">બધા</Button>
+              <Button variant="outline" size="sm">બાકી</Button>
+              <Button variant="outline" size="sm">પ્રોસેસિંગ</Button>
+              <Button variant="outline" size="sm">મોકલાયેલ</Button>
+              <Button variant="outline" size="sm">પહોંચાડેલ</Button>
             </div>
           </div>
         </CardContent>
@@ -121,23 +141,23 @@ export const OrderManagement = () => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <ShoppingCart className="h-5 w-5" />
-            Order List
+            ઓર્ડર યાદી
           </CardTitle>
-          <CardDescription>All customer orders and their current status</CardDescription>
+          <CardDescription>બધા ગ્રાહક ઓર્ડર અને તેમની વર્તમાન સ્થિતિ</CardDescription>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Order ID</TableHead>
-                <TableHead>Customer</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead>Items</TableHead>
-                <TableHead>Total</TableHead>
-                <TableHead>Priority</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Delivery</TableHead>
-                <TableHead>Actions</TableHead>
+                <TableHead>ઓર્ડર ID</TableHead>
+                <TableHead>ગ્રાહક</TableHead>
+                <TableHead>તારીખ</TableHead>
+                <TableHead>આઇટમ</TableHead>
+                <TableHead>કુલ</TableHead>
+                <TableHead>પ્રાથમિકતા</TableHead>
+                <TableHead>સ્થિતિ</TableHead>
+                <TableHead>ડિલિવરી</TableHead>
+                <TableHead>ક્રિયાઓ</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -146,16 +166,16 @@ export const OrderManagement = () => {
                   <TableCell className="font-medium">{order.id}</TableCell>
                   <TableCell>{order.customer}</TableCell>
                   <TableCell>{order.date}</TableCell>
-                  <TableCell>{order.items} items</TableCell>
+                  <TableCell>{order.items} આઇટમ</TableCell>
                   <TableCell className="font-medium">{order.total}</TableCell>
                   <TableCell>
                     <Badge className={getPriorityColor(order.priority)}>
-                      {order.priority.toUpperCase()}
+                      {getPriorityText(order.priority)}
                     </Badge>
                   </TableCell>
                   <TableCell>
                     <Badge className={getStatusColor(order.status)}>
-                      {order.status.toUpperCase()}
+                      {getStatusText(order.status)}
                     </Badge>
                   </TableCell>
                   <TableCell>

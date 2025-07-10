@@ -10,56 +10,56 @@ export const CustomerManagement = () => {
   const customers = [
     {
       id: "CUST-001",
-      name: "AquaTech Solutions",
+      name: "એક્વાટેક સોલ્યુશન્સ",
       email: "contact@aquatech.com",
-      phone: "+1 (555) 123-4567",
-      address: "123 Water St, Miami, FL",
+      phone: "+91 98765 43210",
+      address: "123 વોટર સ્ટ્રીટ, અમદાવાદ, ગુજરાત",
       totalOrders: 15,
-      totalSpent: "$12,450",
+      totalSpent: "₹1,24,500",
       status: "active",
       lastOrder: "2024-01-15"
     },
     {
       id: "CUST-002",
-      name: "Clean Water Co.",
+      name: "ક્લીન વોટર કો.",
       email: "orders@cleanwater.com",
-      phone: "+1 (555) 234-5678",
-      address: "456 Pure Ave, Orlando, FL",
+      phone: "+91 87654 32109",
+      address: "456 પ્યુર એવન્યુ, સુરત, ગુજરાત",
       totalOrders: 8,
-      totalSpent: "$8,920",
+      totalSpent: "₹89,200",
       status: "active",
       lastOrder: "2024-01-10"
     },
     {
       id: "CUST-003",
-      name: "Pure H2O Systems",
+      name: "પ્યુર H2O સિસ્ટમ્સ",
       email: "info@pureh2o.com",
-      phone: "+1 (555) 345-6789",
-      address: "789 Filter Rd, Tampa, FL",
+      phone: "+91 76543 21098",
+      address: "789 ફિલ્ટર રોડ, વડોદરા, ગુજરાત",
       totalOrders: 22,
-      totalSpent: "$18,750",
+      totalSpent: "₹1,87,500",
       status: "vip",
       lastOrder: "2024-01-18"
     },
     {
       id: "CUST-004",
-      name: "FilterMax Ltd.",
+      name: "ફિલ્ટરમેક્સ લિમિટેડ",
       email: "sales@filtermax.com",
-      phone: "+1 (555) 456-7890",
-      address: "321 RO Blvd, Jacksonville, FL",
+      phone: "+91 65432 10987",
+      address: "321 આરઓ બુલેવાર્ડ, રાજકોટ, ગુજરાત",
       totalOrders: 5,
-      totalSpent: "$4,200",
+      totalSpent: "₹42,000",
       status: "new",
       lastOrder: "2024-01-12"
     },
     {
       id: "CUST-005",
-      name: "Hydro Solutions Inc.",
+      name: "હાઇડ્રો સોલ્યુશન્સ ઇન્ક.",
       email: "contact@hydrosolutions.com",
-      phone: "+1 (555) 567-8901",
-      address: "654 Water Way, Fort Lauderdale, FL",
+      phone: "+91 54321 09876",
+      address: "654 વોટર વે, ભાવનગર, ગુજરાત",
       totalOrders: 12,
-      totalSpent: "$9,800",
+      totalSpent: "₹98,000",
       status: "active",
       lastOrder: "2024-01-08"
     }
@@ -75,17 +75,27 @@ export const CustomerManagement = () => {
     }
   };
 
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case "vip": return "વીઆઈપી";
+      case "active": return "સક્રિય";
+      case "new": return "નવા";
+      case "inactive": return "નિષ્ક્રિય";
+      default: return status;
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-foreground">Customer Management</h2>
-          <p className="text-muted-foreground">Manage your wholesale customers and relationships</p>
+          <h2 className="text-2xl font-bold text-foreground">ગ્રાહક મેનેજમેન્ટ</h2>
+          <p className="text-muted-foreground">તમારા હોલસેલ ગ્રાહકો અને સંબંધોનું સંચાલન કરો</p>
         </div>
         <Button>
           <Plus className="h-4 w-4 mr-2" />
-          Add Customer
+          ગ્રાહક ઉમેરો
         </Button>
       </div>
 
@@ -96,15 +106,15 @@ export const CustomerManagement = () => {
             <div className="relative flex-1">
               <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Search customers by name, email, or phone..."
+                placeholder="નામ, ઇમેઇલ અથવા ફોન દ્વારા ગ્રાહકો શોધો..."
                 className="pl-10"
               />
             </div>
             <div className="flex gap-2">
-              <Button variant="outline" size="sm">All</Button>
-              <Button variant="outline" size="sm">VIP</Button>
-              <Button variant="outline" size="sm">Active</Button>
-              <Button variant="outline" size="sm">New</Button>
+              <Button variant="outline" size="sm">બધા</Button>
+              <Button variant="outline" size="sm">વીઆઈપી</Button>
+              <Button variant="outline" size="sm">સક્રિય</Button>
+              <Button variant="outline" size="sm">નવા</Button>
             </div>
           </div>
         </CardContent>
@@ -115,22 +125,22 @@ export const CustomerManagement = () => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Users className="h-5 w-5" />
-            Customer Directory
+            ગ્રાહક ડિરેક્ટરી
           </CardTitle>
-          <CardDescription>Complete list of your wholesale customers</CardDescription>
+          <CardDescription>તમારા હોલસેલ ગ્રાહકોની સંપૂર્ણ યાદી</CardDescription>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Customer ID</TableHead>
-                <TableHead>Company Name</TableHead>
-                <TableHead>Contact Info</TableHead>
-                <TableHead>Address</TableHead>
-                <TableHead>Orders</TableHead>
-                <TableHead>Total Spent</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Actions</TableHead>
+                <TableHead>ગ્રાહક ID</TableHead>
+                <TableHead>કંપનીનું નામ</TableHead>
+                <TableHead>સંપર્ક માહિતી</TableHead>
+                <TableHead>સરનામું</TableHead>
+                <TableHead>ઓર્ડર</TableHead>
+                <TableHead>કુલ ખર્ચ</TableHead>
+                <TableHead>સ્થિતિ</TableHead>
+                <TableHead>ક્રિયાઓ</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -140,7 +150,7 @@ export const CustomerManagement = () => {
                   <TableCell>
                     <div className="font-medium">{customer.name}</div>
                     <div className="text-sm text-muted-foreground">
-                      Last order: {customer.lastOrder}
+                      છેલ્લો ઓર્ડર: {customer.lastOrder}
                     </div>
                   </TableCell>
                   <TableCell>
@@ -165,16 +175,16 @@ export const CustomerManagement = () => {
                   <TableCell className="font-medium">{customer.totalSpent}</TableCell>
                   <TableCell>
                     <Badge className={getStatusColor(customer.status)}>
-                      {customer.status.toUpperCase()}
+                      {getStatusText(customer.status)}
                     </Badge>
                   </TableCell>
                   <TableCell>
                     <div className="flex gap-2">
                       <Button variant="outline" size="sm">
-                        View
+                        જુઓ
                       </Button>
                       <Button variant="outline" size="sm">
-                        Edit
+                        સંપાદિત કરો
                       </Button>
                     </div>
                   </TableCell>

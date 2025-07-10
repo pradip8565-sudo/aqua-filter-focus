@@ -6,65 +6,65 @@ import { TrendingUp, TrendingDown, DollarSign, ShoppingCart, Users, Package } fr
 export const SalesAnalytics = () => {
   const salesMetrics = [
     {
-      title: "Monthly Revenue",
-      value: "$45,230",
+      title: "માસિક આવક",
+      value: "₹45,230",
       change: "+12.5%",
       trend: "up",
-      period: "vs last month"
+      period: "પાછલા મહિને સરખામણીમાં"
     },
     {
-      title: "Total Orders",
+      title: "કુલ ઓર્ડર",
       value: "156",
       change: "+8.2%",
       trend: "up",
-      period: "vs last month"
+      period: "પાછલા મહિને સરખામણીમાં"
     },
     {
-      title: "Average Order Value",
-      value: "$290",
+      title: "સરેરાશ ઓર્ડર વેલ્યુ",
+      value: "₹2,900",
       change: "+4.1%",
       trend: "up",
-      period: "vs last month"
+      period: "પાછલા મહિને સરખામણીમાં"
     },
     {
-      title: "Active Customers",
+      title: "સક્રિય ગ્રાહકો",
       value: "89",
       change: "-2.3%",
       trend: "down",
-      period: "vs last month"
+      period: "પાછલા મહિને સરખામણીમાં"
     }
   ];
 
   const topProducts = [
-    { name: "5-Stage RO System Complete", sales: 45, revenue: "$8,100", growth: "+15%" },
-    { name: "75GPD RO Membrane", sales: 128, revenue: "$3,200", growth: "+22%" },
-    { name: "Sediment Pre-Filter 5 Micron", sales: 89, revenue: "$756", growth: "+8%" },
-    { name: "3.2 Gallon Storage Tank", sales: 34, revenue: "$1,190", growth: "+12%" },
-    { name: "Carbon Block Filter", sales: 67, revenue: "$804", growth: "+5%" }
+    { name: "5-સ્ટેજ આરઓ સિસ્ટમ કમ્પ્લીટ", sales: 45, revenue: "₹81,000", growth: "+15%" },
+    { name: "75GPD આરઓ મેમ્બ્રેન", sales: 128, revenue: "₹32,000", growth: "+22%" },
+    { name: "સેડિમેન્ટ પ્રી-ફિલ્ટર 5 માઇક્રોન", sales: 89, revenue: "₹7,560", growth: "+8%" },
+    { name: "3.2 ગેલન સ્ટોરેજ ટાંકી", sales: 34, revenue: "₹11,900", growth: "+12%" },
+    { name: "કાર્બન બ્લોક ફિલ્ટર", sales: 67, revenue: "₹8,040", growth: "+5%" }
   ];
 
   const topCustomers = [
-    { name: "Pure H2O Systems", orders: 22, spent: "$18,750" },
-    { name: "AquaTech Solutions", orders: 15, spent: "$12,450" },
-    { name: "Hydro Solutions Inc.", orders: 12, spent: "$9,800" },
-    { name: "Clean Water Co.", orders: 8, spent: "$8,920" },
-    { name: "FilterMax Ltd.", orders: 5, spent: "$4,200" }
+    { name: "પ્યુર H2O સિસ્ટમ્સ", orders: 22, spent: "₹1,87,500" },
+    { name: "એક્વાટેક સોલ્યુશન્સ", orders: 15, spent: "₹1,24,500" },
+    { name: "હાઇડ્રો સોલ્યુશન્સ ઇન્ક.", orders: 12, spent: "₹98,000" },
+    { name: "ક્લીન વોટર કો.", orders: 8, spent: "₹89,200" },
+    { name: "ફિલ્ટરમેક્સ લિમિટેડ", orders: 5, spent: "₹42,000" }
   ];
 
   const monthlyData = [
-    { month: "Sep", revenue: 32000, orders: 124 },
-    { month: "Oct", revenue: 38000, orders: 142 },
-    { month: "Nov", revenue: 42000, orders: 158 },
-    { month: "Dec", revenue: 45000, orders: 167 },
-    { month: "Jan", revenue: 45230, orders: 156 }
+    { month: "સપ્ટે", revenue: 320000, orders: 124 },
+    { month: "ઓક્ટો", revenue: 380000, orders: 142 },
+    { month: "નવે", revenue: 420000, orders: 158 },
+    { month: "ડિસે", revenue: 450000, orders: 167 },
+    { month: "જાન્યુ", revenue: 452300, orders: 156 }
   ];
 
   return (
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h2 className="text-2xl font-bold text-foreground">Sales Analytics</h2>
-        <p className="text-muted-foreground">Track your business performance and growth</p>
+        <h2 className="text-2xl font-bold text-foreground">વેચાણ વિશ્લેષણ</h2>
+        <p className="text-muted-foreground">તમારી બિઝનેસ પર્ફોર્મન્સ અને વૃદ્ધિને ટ્રેક કરો</p>
       </div>
 
       {/* Key Metrics */}
@@ -106,9 +106,9 @@ export const SalesAnalytics = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Package className="h-5 w-5" />
-              Top Selling Products
+              સૌથી વધુ વેચાતા પ્રોડક્ટ્સ
             </CardTitle>
-            <CardDescription>Best performing products this month</CardDescription>
+            <CardDescription>આ મહિને શ્રેષ્ઠ પર્ફોર્મિંગ પ્રોડક્ટ્સ</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -117,7 +117,7 @@ export const SalesAnalytics = () => {
                   <div>
                     <div className="font-medium text-sm">{product.name}</div>
                     <div className="text-sm text-muted-foreground">
-                      {product.sales} units sold
+                      {product.sales} યુનિટ વેચાયા
                     </div>
                   </div>
                   <div className="text-right">
@@ -137,9 +137,9 @@ export const SalesAnalytics = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Users className="h-5 w-5" />
-              Top Customers
+              ટોપ ગ્રાહકો
             </CardTitle>
-            <CardDescription>Highest value customers this month</CardDescription>
+            <CardDescription>આ મહિને સૌથી વધુ વેલ્યુ ગ્રાહકો</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -148,14 +148,14 @@ export const SalesAnalytics = () => {
                   <div>
                     <div className="font-medium text-sm">{customer.name}</div>
                     <div className="text-sm text-muted-foreground">
-                      {customer.orders} orders
+                      {customer.orders} ઓર્ડર
                     </div>
                   </div>
                   <div className="text-right">
                     <div className="font-medium">{customer.spent}</div>
                     {index === 0 && (
                       <Badge className="bg-purple-500/10 text-purple-700 border-purple-200 text-xs">
-                        VIP
+                        વીઆઈપી
                       </Badge>
                     )}
                   </div>
@@ -169,8 +169,8 @@ export const SalesAnalytics = () => {
       {/* Revenue Trend */}
       <Card>
         <CardHeader>
-          <CardTitle>Revenue Trend</CardTitle>
-          <CardDescription>Monthly revenue and order volume over the last 5 months</CardDescription>
+          <CardTitle>આવકનો ટ્રેન્ડ</CardTitle>
+          <CardDescription>છેલ્લા 5 મહિનામાં માસિક આવક અને ઓર્ડર વોલ્યુમ</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
@@ -179,11 +179,11 @@ export const SalesAnalytics = () => {
                 <div className="font-medium">{data.month} 2024</div>
                 <div className="flex items-center gap-8">
                   <div className="text-right">
-                    <div className="text-sm text-muted-foreground">Revenue</div>
-                    <div className="font-medium">${data.revenue.toLocaleString()}</div>
+                    <div className="text-sm text-muted-foreground">આવક</div>
+                    <div className="font-medium">₹{data.revenue.toLocaleString()}</div>
                   </div>
                   <div className="text-right">
-                    <div className="text-sm text-muted-foreground">Orders</div>
+                    <div className="text-sm text-muted-foreground">ઓર્ડર</div>
                     <div className="font-medium">{data.orders}</div>
                   </div>
                   <div className="w-32 bg-gray-200 rounded-full h-2">
