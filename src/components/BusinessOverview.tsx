@@ -1,91 +1,129 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { TrendingUp, Package, Users, ShoppingCart, DollarSign, AlertTriangle } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { IndianRupee, Package, Users, ShoppingCart } from "lucide-react";
 
 export const BusinessOverview = () => {
   const { t } = useLanguage();
 
-  const businessMetrics = [
-    {
-      title: t('metrics.monthly.income'),
-      value: "₹45,230",
-      change: "+12.5%",
-      trend: "up",
-      icon: DollarSign
-    },
-    {
-      title: t('metrics.active.orders'),
-      value: "23",
-      change: "+5",
-      trend: "up",
-      icon: ShoppingCart
-    },
-    {
-      title: t('metrics.total.customers'),
-      value: "156",
-      change: "+8",
-      trend: "up",
-      icon: Users
-    },
-    {
-      title: t('metrics.inventory.items'),
-      value: "89",
-      change: "-3",
-      trend: "down",
-      icon: Package
+  const { data: metrics } = useQuery({
+    queryKey: ['business-metrics'],
+    queryFn: async () => {
+      const [ordersResult, customersResult, inventoryResult] = await Promise.all([
+        supabase.from('orders').select('total_amount, status'),
+        supabase.from('customers').select('id'),
+        supabase.from('inventory').select('id, stock_quantity, minimum_stock')
+      ]);
+
+      const totalRevenue = ordersResult.data?.reduce((sum, order) => sum + Number(order.total_amount), 0) || 0;
+      const activeOrders = ordersResult.data?.filter(order => !['delivered', 'cancelled'].includes(order.status)).length || 0;
+      const totalCustomers = customersResult.data?.length || 0;
+      const totalItems = inventoryResult.data?.length || 0;
+
+      return {
+        monthlyIncome: totalRevenue,
+        activeOrders,
+        totalCustomers,
+        inventoryItems: totalItems
+      };
     }
-  ];
+  });
 
-  const recentOrders = [
-    { id: "ORD-001", customer: "એક્વાટેક સોલ્યુશન્સ", amount: "₹2,450", status: t('status.processing') },
-    { id: "ORD-002", customer: "ક્લીન વોટર કો.", amount: "₹1,890", status: t('status.shipped') },
-    { id: "ORD-003", customer: "પ્યુર H2O સિસ્ટમ્સ", amount: "₹3,200", status: t('status.delivered') },
-    { id: "ORD-004", customer: "ફિલ્ટરમેક્સ લિમિટેડ", amount: "₹950", status: t('status.pending') }
-  ];
+  const { data: recentOrders } = useQuery({
+    queryKey: ['recent-orders'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('orders')
+        .select(`
+          id,
+          order_number,
+          total_amount,
+          status,
+          created_at,
+          customers (name)
+        `)
+        .order('created_at', { ascending: false })
+        .limit(5);
 
-  const lowStockItems = [
-    { name: "5-સ્ટેજ આરઓ મેમ્બ્રેન", current: 5, minimum: 10 },
-    { name: "કાર્બન પ્રી-ફિલ્ટર", current: 8, minimum: 15 },
-    { name: "સેડિમેન્ટ ફિલ્ટર", current: 12, minimum: 20 }
-  ];
+      if (error) throw error;
+      return data;
+    }
+  });
+
+  const { data: lowStockItems } = useQuery({
+    queryKey: ['low-stock-items'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('inventory')
+        .select('name, stock_quantity, minimum_stock')
+        .lt('stock_quantity', 'minimum_stock')
+        .limit(5);
+
+      if (error) throw error;
+      return data;
+    }
+  });
 
   const getStatusColor = (status: string) => {
-    if (status === t('status.delivered')) return "bg-green-500/10 text-green-700 border-green-200";
-    if (status === t('status.shipped')) return "bg-blue-500/10 text-blue-700 border-blue-200";
-    if (status === t('status.processing')) return "bg-yellow-500/10 text-yellow-700 border-yellow-200";
-    if (status === t('status.pending')) return "bg-red-500/10 text-red-700 border-red-200";
-    return "bg-gray-500/10 text-gray-700 border-gray-200";
+    switch (status) {
+      case 'delivered': return 'bg-green-100 text-green-800';
+      case 'shipped': return 'bg-blue-100 text-blue-800';
+      case 'processing': return 'bg-yellow-100 text-yellow-800';
+      case 'pending': return 'bg-gray-100 text-gray-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
   };
 
   return (
     <div className="space-y-6">
-      {/* Key Metrics */}
+      {/* Metrics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {businessMetrics.map((metric) => (
-          <Card key={metric.title}>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">{metric.title}</p>
-                  <p className="text-2xl font-bold text-foreground">{metric.value}</p>
-                  <div className="flex items-center mt-1">
-                    <TrendingUp className={`h-3 w-3 mr-1 ${metric.trend === 'up' ? 'text-green-600' : 'text-red-600'}`} />
-                    <span className={`text-xs ${metric.trend === 'up' ? 'text-green-600' : 'text-red-600'}`}>
-                      {metric.change}
-                    </span>
-                  </div>
-                </div>
-                <metric.icon className="h-8 w-8 text-blue-600" />
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">{t('metrics.monthly.income')}</CardTitle>
+            <IndianRupee className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">₹{(metrics?.monthlyIncome || 0).toLocaleString('en-IN')}</div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">{t('metrics.active.orders')}</CardTitle>
+            <ShoppingCart className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{metrics?.activeOrders || 0}</div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">{t('metrics.total.customers')}</CardTitle>
+            <Users className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{metrics?.totalCustomers || 0}</div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">{t('metrics.inventory.items')}</CardTitle>
+            <Package className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{metrics?.inventoryItems || 0}</div>
+          </CardContent>
+        </Card>
       </div>
 
+      {/* Recent Orders and Low Stock */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Recent Orders */}
         <Card>
           <CardHeader>
             <CardTitle>{t('recent.orders')}</CardTitle>
@@ -93,17 +131,15 @@ export const BusinessOverview = () => {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {recentOrders.map((order) => (
-                <div key={order.id} className="flex items-center justify-between p-3 border rounded">
+              {recentOrders?.map((order) => (
+                <div key={order.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
                   <div>
-                    <div className="font-medium">{order.id}</div>
-                    <div className="text-sm text-muted-foreground">{order.customer}</div>
+                    <p className="font-medium">{order.order_number}</p>
+                    <p className="text-sm text-muted-foreground">{order.customers?.name}</p>
                   </div>
                   <div className="text-right">
-                    <div className="font-medium">{order.amount}</div>
-                    <Badge className={getStatusColor(order.status)}>
-                      {order.status}
-                    </Badge>
+                    <p className="font-medium">₹{Number(order.total_amount).toLocaleString('en-IN')}</p>
+                    <Badge className={getStatusColor(order.status)}>{t(`status.${order.status}`)}</Badge>
                   </div>
                 </div>
               ))}
@@ -111,28 +147,22 @@ export const BusinessOverview = () => {
           </CardContent>
         </Card>
 
-        {/* Low Stock Alert */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <AlertTriangle className="h-5 w-5 text-yellow-600" />
-              {t('low.stock.alert')}
-            </CardTitle>
+            <CardTitle>{t('low.stock.alert')}</CardTitle>
             <CardDescription>{t('low.stock.desc')}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {lowStockItems.map((item, index) => (
-                <div key={index} className="flex items-center justify-between p-3 border rounded bg-yellow-50">
+              {lowStockItems?.map((item, index) => (
+                <div key={index} className="flex items-center justify-between p-3 bg-red-50 rounded-lg border border-red-200">
                   <div>
-                    <div className="font-medium">{item.name}</div>
-                    <div className="text-sm text-muted-foreground">
-                      વર્તમાન: {item.current} | લઘુત્તમ: {item.minimum}
-                    </div>
+                    <p className="font-medium">{item.name}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {t('status.low.stock')}: {item.stock_quantity}/{item.minimum_stock}
+                    </p>
                   </div>
-                  <Badge className="bg-yellow-500/10 text-yellow-700 border-yellow-200">
-                    {t('status.low.stock')}
-                  </Badge>
+                  <Badge variant="destructive">{t('status.low.stock')}</Badge>
                 </div>
               ))}
             </div>

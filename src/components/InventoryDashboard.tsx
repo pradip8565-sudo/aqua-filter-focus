@@ -1,200 +1,520 @@
 
+import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Search, Plus, Package, AlertTriangle } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useForm } from "react-hook-form";
+import { supabase } from "@/integrations/supabase/client";
+import { Plus, Search, Edit, Trash2 } from "lucide-react";
+import { toast } from "sonner";
+
+interface InventoryItem {
+  id: string;
+  product_id: string;
+  name: string;
+  description?: string;
+  unit_price: number;
+  selling_price: number;
+  stock_quantity: number;
+  minimum_stock: number;
+  unit?: string;
+  hsn_code?: string;
+  gst_rate?: number;
+  status?: string;
+  category_id?: string;
+  supplier_id?: string;
+  categories?: { name: string };
+  suppliers?: { name: string };
+}
 
 export const InventoryDashboard = () => {
-  const inventoryItems = [
-    {
-      id: "RO-001",
-      name: "5-સ્ટેજ આરઓ સિસ્ટમ કમ્પ્લીટ",
-      category: "કમ્પ્લીટ સિસ્ટમ્સ",
-      stock: 25,
-      minimum: 10,
-      price: "₹18,000",
-      supplier: "એક્વાટેક કોર્પ",
-      status: "in-stock"
-    },
-    {
-      id: "MEM-001",
-      name: "75GPD આરઓ મેમ્બ્રેન",
-      category: "મેમ્બ્રેન",
-      stock: 5,
-      minimum: 10,
-      price: "₹2,500",
-      supplier: "ફિલ્ટરપ્રો લિમિટેડ",
-      status: "low-stock"
-    },
-    {
-      id: "FIL-001",
-      name: "સેડિમેન્ટ પ્રી-ફિલ્ટર 5 માઇક્રોન",
-      category: "ફિલ્ટર",
-      stock: 45,
-      minimum: 20,
-      price: "₹850",
-      supplier: "પ્યુર વોટર ઇન્ક",
-      status: "in-stock"
-    },
-    {
-      id: "FIL-002",
-      name: "કાર્બન બ્લોક ફિલ્ટર",
-      category: "ફિલ્ટર",
-      stock: 12,
-      minimum: 15,
-      price: "₹1,200",
-      supplier: "ફિલ્ટરપ્રો લિમિટેડ",
-      status: "low-stock"
-    },
-    {
-      id: "TANK-001",
-      name: "3.2 ગેલન સ્ટોરેજ ટાંકી",
-      category: "ટાંકી",
-      stock: 18,
-      minimum: 8,
-      price: "₹3,500",
-      supplier: "ટાંકમેક્સ કો",
-      status: "in-stock"
-    },
-    {
-      id: "PUMP-001",
-      name: "બૂસ્ટર પંપ 50GPD",
-      category: "પંપ",
-      stock: 8,
-      minimum: 5,
-      price: "₹6,500",
-      supplier: "પંપટેક સોલ્યુશન્સ",
-      status: "in-stock"
-    }
-  ];
+  const [searchTerm, setSearchTerm] = useState("");
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [editingItem, setEditingItem] = useState<InventoryItem | null>(null);
+  const queryClient = useQueryClient();
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "in-stock": return "bg-green-500/10 text-green-700 border-green-200";
-      case "low-stock": return "bg-yellow-500/10 text-yellow-700 border-yellow-200";
-      case "out-of-stock": return "bg-red-500/10 text-red-700 border-red-200";
-      default: return "bg-gray-500/10 text-gray-700 border-gray-200";
+  const form = useForm({
+    defaultValues: {
+      product_id: "",
+      name: "",
+      description: "",
+      unit_price: 0,
+      selling_price: 0,
+      stock_quantity: 0,
+      minimum_stock: 0,
+      unit: "piece",
+      hsn_code: "",
+      gst_rate: 18.00,
+      status: "active",
+      category_id: "",
+      supplier_id: ""
+    }
+  });
+
+  const { data: inventory, isLoading } = useQuery({
+    queryKey: ['inventory', searchTerm],
+    queryFn: async () => {
+      let query = supabase
+        .from('inventory')
+        .select(`
+          *,
+          categories (name),
+          suppliers (name)
+        `)
+        .order('created_at', { ascending: false });
+
+      if (searchTerm) {
+        query = query.or(`name.ilike.%${searchTerm}%,product_id.ilike.%${searchTerm}%`);
+      }
+
+      const { data, error } = await query;
+      if (error) throw error;
+      return data as InventoryItem[];
+    }
+  });
+
+  const { data: categories } = useQuery({
+    queryKey: ['categories'],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('categories').select('*');
+      if (error) throw error;
+      return data;
+    }
+  });
+
+  const { data: suppliers } = useQuery({
+    queryKey: ['suppliers'],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('suppliers').select('*');
+      if (error) throw error;
+      return data;
+    }
+  });
+
+  const addMutation = useMutation({
+    mutationFn: async (data: any) => {
+      const { error } = await supabase.from('inventory').insert(data);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['inventory'] });
+      setIsAddDialogOpen(false);
+      form.reset();
+      toast.success("Product added successfully!");
+    },
+    onError: () => {
+      toast.error("Failed to add product");
+    }
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: string; data: any }) => {
+      const { error } = await supabase.from('inventory').update(data).eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['inventory'] });
+      setEditingItem(null);
+      form.reset();
+      toast.success("Product updated successfully!");
+    },
+    onError: () => {
+      toast.error("Failed to update product");
+    }
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from('inventory').delete().eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['inventory'] });
+      toast.success("Product deleted successfully!");
+    },
+    onError: () => {
+      toast.error("Failed to delete product");
+    }
+  });
+
+  const onSubmit = (data: any) => {
+    if (editingItem) {
+      updateMutation.mutate({ id: editingItem.id, data });
+    } else {
+      addMutation.mutate(data);
     }
   };
 
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case "in-stock": return "સ્ટોકમાં";
-      case "low-stock": return "ઓછો સ્ટોક";
-      case "out-of-stock": return "સ્ટોક આઉટ";
-      default: return status;
-    }
+  const handleEdit = (item: InventoryItem) => {
+    setEditingItem(item);
+    form.reset({
+      product_id: item.product_id,
+      name: item.name,
+      description: item.description || "",
+      unit_price: item.unit_price,
+      selling_price: item.selling_price,
+      stock_quantity: item.stock_quantity,
+      minimum_stock: item.minimum_stock,
+      unit: item.unit || "piece",
+      hsn_code: item.hsn_code || "",
+      gst_rate: item.gst_rate || 18.00,
+      status: item.status || "active",
+      category_id: item.category_id || "",
+      supplier_id: item.supplier_id || ""
+    });
   };
 
-  const categories = ["બધા", "કમ્પ્લીટ સિસ્ટમ્સ", "મેમ્બ્રેન", "ફિલ્ટર", "ટાંકી", "પંપ"];
+  const getStockStatus = (current: number, minimum: number) => {
+    if (current === 0) return { label: "Out of Stock", color: "bg-red-100 text-red-800" };
+    if (current <= minimum) return { label: "Low Stock", color: "bg-yellow-100 text-yellow-800" };
+    return { label: "In Stock", color: "bg-green-100 text-green-800" };
+  };
 
   return (
     <div className="space-y-6">
-      {/* Header with Search and Add Button */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold text-foreground">ઇન્વેન્ટરી મેનેજમેન્ટ</h2>
-          <p className="text-muted-foreground">તમારા આરઓ ફિલ્ટર પ્રોડક્ટ્સ અને સ્ટોક લેવલનું સંચાલન કરો</p>
-        </div>
-        <Button>
-          <Plus className="h-4 w-4 mr-2" />
-          પ્રોડક્ટ ઉમેરો
-        </Button>
-      </div>
-
-      {/* Search and Filter */}
-      <Card>
-        <CardContent className="p-6">
-          <div className="flex items-center gap-4">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="નામ અથવા ID દ્વારા પ્રોડક્ટ્સ શોધો..."
-                className="pl-10"
-              />
-            </div>
-            <div className="flex gap-2">
-              {categories.map((category, index) => (
-                <Button
-                  key={category}
-                  variant={index === 0 ? "default" : "outline"}
-                  size="sm"
-                >
-                  {category}
-                </Button>
-              ))}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Inventory Table */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Package className="h-5 w-5" />
-            પ્રોડક્ટ ઇન્વેન્ટરી
-          </CardTitle>
-          <CardDescription>વર્તમાન સ્ટોક લેવલ અને પ્રોડક્ટની માહિતી</CardDescription>
+          <CardTitle>Inventory Management</CardTitle>
+          <CardDescription>Manage your products and stock levels</CardDescription>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>પ્રોડક્ટ ID</TableHead>
-                <TableHead>પ્રોડક્ટનું નામ</TableHead>
-                <TableHead>કેટેગરી</TableHead>
-                <TableHead>સ્ટોક</TableHead>
-                <TableHead>યુનિટ કિંમત</TableHead>
-                <TableHead>સપ્લાયર</TableHead>
-                <TableHead>સ્થિતિ</TableHead>
-                <TableHead>ક્રિયાઓ</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {inventoryItems.map((item) => (
-                <TableRow key={item.id}>
-                  <TableCell className="font-medium">{item.id}</TableCell>
-                  <TableCell>
-                    <div>
-                      <div className="font-medium">{item.name}</div>
+          <div className="flex flex-col sm:flex-row gap-4 mb-6">
+            <div className="flex-1">
+              <div className="relative">
+                <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                <Input
+                  placeholder="Search products..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+            </div>
+            <Dialog open={isAddDialogOpen || !!editingItem} onOpenChange={(open) => {
+              if (!open) {
+                setIsAddDialogOpen(false);
+                setEditingItem(null);
+                form.reset();
+              }
+            }}>
+              <DialogTrigger asChild>
+                <Button onClick={() => setIsAddDialogOpen(true)}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Product
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle>{editingItem ? 'Edit Product' : 'Add New Product'}</DialogTitle>
+                  <DialogDescription>
+                    {editingItem ? 'Update product information' : 'Enter product details to add to inventory'}
+                  </DialogDescription>
+                </DialogHeader>
+                <Form {...form}>
+                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="product_id"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Product ID</FormLabel>
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="name"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Product Name</FormLabel>
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
                     </div>
-                  </TableCell>
-                  <TableCell>{item.category}</TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      {item.stock < item.minimum && (
-                        <AlertTriangle className="h-4 w-4 text-yellow-600" />
+
+                    <FormField
+                      control={form.control}
+                      name="description"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Description</FormLabel>
+                          <FormControl>
+                            <Textarea {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
                       )}
-                      <span>{item.stock} યુનિટ</span>
-                      <span className="text-sm text-muted-foreground">
-                        (લઘુત્તમ: {item.minimum})
-                      </span>
+                    />
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="category_id"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Category</FormLabel>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select category" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                {categories?.map((category) => (
+                                  <SelectItem key={category.id} value={category.id}>
+                                    {category.name}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="supplier_id"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Supplier</FormLabel>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select supplier" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                {suppliers?.map((supplier) => (
+                                  <SelectItem key={supplier.id} value={supplier.id}>
+                                    {supplier.name}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
                     </div>
-                  </TableCell>
-                  <TableCell className="font-medium">{item.price}</TableCell>
-                  <TableCell>{item.supplier}</TableCell>
-                  <TableCell>
-                    <Badge className={getStatusColor(item.status)}>
-                      {getStatusText(item.status)}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex gap-2">
-                      <Button variant="outline" size="sm">
-                        સંપાદિત કરો
-                      </Button>
-                      <Button variant="outline" size="sm">
-                        રિઓર્ડર
-                      </Button>
+
+                    <div className="grid grid-cols-4 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="unit_price"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Unit Price</FormLabel>
+                            <FormControl>
+                              <Input type="number" step="0.01" {...field} onChange={(e) => field.onChange(parseFloat(e.target.value))} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="selling_price"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Selling Price</FormLabel>
+                            <FormControl>
+                              <Input type="number" step="0.01" {...field} onChange={(e) => field.onChange(parseFloat(e.target.value))} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="stock_quantity"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Stock Quantity</FormLabel>
+                            <FormControl>
+                              <Input type="number" {...field} onChange={(e) => field.onChange(parseInt(e.target.value))} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="minimum_stock"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Minimum Stock</FormLabel>
+                            <FormControl>
+                              <Input type="number" {...field} onChange={(e) => field.onChange(parseInt(e.target.value))} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
                     </div>
-                  </TableCell>
+
+                    <div className="grid grid-cols-3 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="unit"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Unit</FormLabel>
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="hsn_code"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>HSN Code</FormLabel>
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="gst_rate"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>GST Rate (%)</FormLabel>
+                            <FormControl>
+                              <Input type="number" step="0.01" {...field} onChange={(e) => field.onChange(parseFloat(e.target.value))} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    <FormField
+                      control={form.control}
+                      name="status"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Status</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="active">Active</SelectItem>
+                              <SelectItem value="inactive">Inactive</SelectItem>
+                              <SelectItem value="discontinued">Discontinued</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <DialogFooter>
+                      <Button type="submit" disabled={addMutation.isPending || updateMutation.isPending}>
+                        {editingItem ? 'Update Product' : 'Add Product'}
+                      </Button>
+                    </DialogFooter>
+                  </form>
+                </Form>
+              </DialogContent>
+            </Dialog>
+          </div>
+
+          <div className="border rounded-lg">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Product ID</TableHead>
+                  <TableHead>Name</TableHead>
+                  <TableHead>Category</TableHead>
+                  <TableHead>Stock</TableHead>
+                  <TableHead>Unit Price</TableHead>
+                  <TableHead>Selling Price</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Actions</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {isLoading ? (
+                  <TableRow>
+                    <TableCell colSpan={8} className="text-center">Loading...</TableCell>
+                  </TableRow>
+                ) : inventory?.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={8} className="text-center">No products found</TableCell>
+                  </TableRow>
+                ) : (
+                  inventory?.map((item) => {
+                    const stockStatus = getStockStatus(item.stock_quantity, item.minimum_stock);
+                    return (
+                      <TableRow key={item.id}>
+                        <TableCell className="font-medium">{item.product_id}</TableCell>
+                        <TableCell>{item.name}</TableCell>
+                        <TableCell>{item.categories?.name || 'N/A'}</TableCell>
+                        <TableCell>
+                          <div className="flex flex-col">
+                            <span>{item.stock_quantity} {item.unit}</span>
+                            <Badge className={`text-xs ${stockStatus.color}`}>
+                              {stockStatus.label}
+                            </Badge>
+                          </div>
+                        </TableCell>
+                        <TableCell>₹{item.unit_price.toLocaleString('en-IN')}</TableCell>
+                        <TableCell>₹{item.selling_price.toLocaleString('en-IN')}</TableCell>
+                        <TableCell>
+                          <Badge variant={item.status === 'active' ? 'default' : 'secondary'}>
+                            {item.status}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleEdit(item)}
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => deleteMutation.mutate(item.id)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })
+                )}
+              </TableBody>
+            </Table>
+          </div>
         </CardContent>
       </Card>
     </div>
