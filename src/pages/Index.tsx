@@ -6,10 +6,11 @@ import { SalesAnalytics } from "@/components/SalesAnalytics";
 import { SupplierManagement } from "@/components/SupplierManagement";
 import { BusinessOverview } from "@/components/BusinessOverview";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
-import { Package } from "lucide-react";
+import { Package, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { Link } from "react-router-dom";
 
 const Index = () => {
   const { t } = useLanguage();
@@ -27,6 +28,12 @@ const Index = () => {
               <Package className="h-4 w-4 mr-2" />
               {t('quick.order')}
             </Button>
+            <Link to="/inventory-app">
+              <Button variant="outline" size="sm">
+                <ExternalLink className="h-4 w-4 mr-2" />
+                Public Catalog
+              </Button>
+            </Link>
             <LanguageSwitcher />
           </div>
         </div>
