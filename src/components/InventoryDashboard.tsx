@@ -102,7 +102,16 @@ export const InventoryDashboard = () => {
 
   const addMutation = useMutation({
     mutationFn: async (data: any) => {
-      const { error } = await supabase.from('inventory').insert(data);
+      const cleanData = {
+        ...data,
+        unit_price: Number(data.unit_price) || 0,
+        selling_price: Number(data.selling_price) || 0,
+        stock_quantity: Number(data.stock_quantity) || 0,
+        minimum_stock: Number(data.minimum_stock) || 0,
+        gst_rate: Number(data.gst_rate) || 18.00
+      };
+      
+      const { error } = await supabase.from('inventory').insert(cleanData);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -111,14 +120,24 @@ export const InventoryDashboard = () => {
       form.reset();
       toast.success("Product added successfully!");
     },
-    onError: () => {
+    onError: (error) => {
+      console.error('Add error:', error);
       toast.error("Failed to add product");
     }
   });
 
   const updateMutation = useMutation({
     mutationFn: async ({ id, data }: { id: string; data: any }) => {
-      const { error } = await supabase.from('inventory').update(data).eq('id', id);
+      const cleanData = {
+        ...data,
+        unit_price: Number(data.unit_price) || 0,
+        selling_price: Number(data.selling_price) || 0,
+        stock_quantity: Number(data.stock_quantity) || 0,
+        minimum_stock: Number(data.minimum_stock) || 0,
+        gst_rate: Number(data.gst_rate) || 18.00
+      };
+      
+      const { error } = await supabase.from('inventory').update(cleanData).eq('id', id);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -127,7 +146,8 @@ export const InventoryDashboard = () => {
       form.reset();
       toast.success("Product updated successfully!");
     },
-    onError: () => {
+    onError: (error) => {
+      console.error('Update error:', error);
       toast.error("Failed to update product");
     }
   });
@@ -147,6 +167,7 @@ export const InventoryDashboard = () => {
   });
 
   const onSubmit = (data: any) => {
+    console.log('Form data:', data);
     if (editingItem) {
       updateMutation.mutate({ id: editingItem.id, data });
     } else {
@@ -337,7 +358,13 @@ export const InventoryDashboard = () => {
                           <FormItem>
                             <FormLabel>Unit Price</FormLabel>
                             <FormControl>
-                              <Input type="number" step="0.01" {...field} onChange={(e) => field.onChange(parseFloat(e.target.value))} />
+                              <Input 
+                                type="number" 
+                                step="0.01" 
+                                {...field} 
+                                value={field.value || ''}
+                                onChange={(e) => field.onChange(e.target.value ? parseFloat(e.target.value) : 0)} 
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -350,7 +377,13 @@ export const InventoryDashboard = () => {
                           <FormItem>
                             <FormLabel>Selling Price</FormLabel>
                             <FormControl>
-                              <Input type="number" step="0.01" {...field} onChange={(e) => field.onChange(parseFloat(e.target.value))} />
+                              <Input 
+                                type="number" 
+                                step="0.01" 
+                                {...field} 
+                                value={field.value || ''}
+                                onChange={(e) => field.onChange(e.target.value ? parseFloat(e.target.value) : 0)} 
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -363,7 +396,12 @@ export const InventoryDashboard = () => {
                           <FormItem>
                             <FormLabel>Stock Quantity</FormLabel>
                             <FormControl>
-                              <Input type="number" {...field} onChange={(e) => field.onChange(parseInt(e.target.value))} />
+                              <Input 
+                                type="number" 
+                                {...field} 
+                                value={field.value || ''}
+                                onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : 0)} 
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -376,7 +414,12 @@ export const InventoryDashboard = () => {
                           <FormItem>
                             <FormLabel>Minimum Stock</FormLabel>
                             <FormControl>
-                              <Input type="number" {...field} onChange={(e) => field.onChange(parseInt(e.target.value))} />
+                              <Input 
+                                type="number" 
+                                {...field} 
+                                value={field.value || ''}
+                                onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : 0)} 
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -418,7 +461,13 @@ export const InventoryDashboard = () => {
                           <FormItem>
                             <FormLabel>GST Rate (%)</FormLabel>
                             <FormControl>
-                              <Input type="number" step="0.01" {...field} onChange={(e) => field.onChange(parseFloat(e.target.value))} />
+                              <Input 
+                                type="number" 
+                                step="0.01" 
+                                {...field} 
+                                value={field.value || ''}
+                                onChange={(e) => field.onChange(e.target.value ? parseFloat(e.target.value) : 18.00)} 
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>

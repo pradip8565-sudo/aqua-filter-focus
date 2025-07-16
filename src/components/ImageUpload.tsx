@@ -40,24 +40,36 @@ export const ImageUpload = ({ currentImageUrl, onImageUploaded, onImageRemoved }
       const fileExt = file.name.split('.').pop();
       const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
 
+      console.log('Uploading file:', fileName, 'Size:', file.size);
+
       // Upload to Supabase Storage
       const { data, error } = await supabase.storage
         .from('product-images')
-        .upload(fileName, file);
+        .upload(fileName, file, {
+          cacheControl: '3600',
+          upsert: false
+        });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Upload error:', error);
+        throw error;
+      }
+
+      console.log('Upload successful:', data);
 
       // Get public URL
       const { data: { publicUrl } } = supabase.storage
         .from('product-images')
         .getPublicUrl(data.path);
 
+      console.log('Public URL:', publicUrl);
+
       setPreviewUrl(publicUrl);
       onImageUploaded(publicUrl);
       toast.success("Image uploaded successfully!");
     } catch (error) {
       console.error('Error uploading image:', error);
-      toast.error("Failed to upload image");
+      toast.error("Failed to upload image. Please try again.");
     } finally {
       setUploading(false);
     }
