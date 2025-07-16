@@ -94,6 +94,7 @@ export type Database = {
           gst_rate: number | null
           hsn_code: string | null
           id: string
+          image_url: string | null
           minimum_stock: number
           name: string
           product_id: string
@@ -112,6 +113,7 @@ export type Database = {
           gst_rate?: number | null
           hsn_code?: string | null
           id?: string
+          image_url?: string | null
           minimum_stock?: number
           name: string
           product_id: string
@@ -130,6 +132,7 @@ export type Database = {
           gst_rate?: number | null
           hsn_code?: string | null
           id?: string
+          image_url?: string | null
           minimum_stock?: number
           name?: string
           product_id?: string

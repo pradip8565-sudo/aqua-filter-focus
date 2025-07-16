@@ -1,4 +1,3 @@
-
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -24,6 +23,7 @@ interface InventoryItem {
   status?: string;
   categories?: { name: string };
   suppliers?: { name: string };
+  image_url?: string;
 }
 
 const InventoryApp = () => {
@@ -143,6 +143,17 @@ const InventoryApp = () => {
               const stockStatus = getStockStatus(item.stock_quantity, item.minimum_stock);
               return (
                 <Card key={item.id} className="hover:shadow-lg transition-shadow duration-200">
+                  {/* Product Image */}
+                  {item.image_url && (
+                    <div className="aspect-square w-full overflow-hidden rounded-t-lg bg-gray-100">
+                      <img
+                        src={item.image_url}
+                        alt={item.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  )}
+                  
                   <CardHeader className="pb-3">
                     <div className="flex justify-between items-start mb-2 gap-2">
                       <Badge variant="outline" className="text-xs flex-shrink-0">
