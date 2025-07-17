@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { handleInventoryError } from "./InventoryErrorHandler";
+import { Upload, X } from "lucide-react";
 
 interface InventoryFormProps {
   setOpen: (open: boolean) => void;
@@ -32,6 +33,7 @@ interface FormData {
   hsn_code: string;
   gst_rate: string;
   status: string;
+  image_url: string;
 }
 
 export const InventoryForm = ({ setOpen }: InventoryFormProps) => {
@@ -46,10 +48,64 @@ export const InventoryForm = ({ setOpen }: InventoryFormProps) => {
     unit: 'piece',
     hsn_code: '',
     gst_rate: '18',
-    status: 'active'
+    status: 'active',
+    image_url: ''
   });
+  const [isUploading, setIsUploading] = useState(false);
 
   const queryClient = useQueryClient();
+
+  const uploadImage = async (file: File): Promise<string> => {
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${Date.now()}.${fileExt}`;
+    const filePath = `${fileName}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from('product-images')
+      .upload(filePath, file);
+
+    if (uploadError) {
+      throw uploadError;
+    }
+
+    const { data } = supabase.storage
+      .from('product-images')
+      .getPublicUrl(filePath);
+
+    return data.publicUrl;
+  };
+
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("File size must be less than 5MB");
+      return;
+    }
+
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    if (!allowedTypes.includes(file.type)) {
+      toast.error("Please upload a valid image file (JPEG, PNG, WebP, or GIF)");
+      return;
+    }
+
+    setIsUploading(true);
+    try {
+      const imageUrl = await uploadImage(file);
+      setFormData(prev => ({ ...prev, image_url: imageUrl }));
+      toast.success("Image uploaded successfully!");
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      toast.error("Failed to upload image. Please try again.");
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const removeImage = () => {
+    setFormData(prev => ({ ...prev, image_url: '' }));
+  };
 
   const createInventory = useMutation({
     mutationFn: async (data: FormData) => {
@@ -66,7 +122,8 @@ export const InventoryForm = ({ setOpen }: InventoryFormProps) => {
           unit: data.unit,
           hsn_code: data.hsn_code || null,
           gst_rate: parseFloat(data.gst_rate),
-          status: data.status
+          status: data.status,
+          image_url: data.image_url || null
         }]);
 
       if (error) throw error;
@@ -86,7 +143,8 @@ export const InventoryForm = ({ setOpen }: InventoryFormProps) => {
         unit: 'piece',
         hsn_code: '',
         gst_rate: '18',
-        status: 'active'
+        status: 'active',
+        image_url: ''
       });
     },
     onError: (error) => {
@@ -144,6 +202,44 @@ export const InventoryForm = ({ setOpen }: InventoryFormProps) => {
           placeholder="Enter product description"
           rows={3}
         />
+      </div>
+
+      <div>
+        <Label htmlFor="image">Product Image</Label>
+        <div className="space-y-4">
+          {formData.image_url ? (
+            <div className="relative inline-block">
+              <img
+                src={formData.image_url}
+                alt="Product preview"
+                className="w-32 h-32 object-cover rounded-lg border"
+              />
+              <Button
+                type="button"
+                variant="destructive"
+                size="sm"
+                className="absolute -top-2 -right-2 h-6 w-6 rounded-full p-0"
+                onClick={removeImage}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+          ) : (
+            <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6 text-center">
+              <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
+              <div className="text-sm text-muted-foreground mb-2">
+                Upload product image (Max 5MB)
+              </div>
+              <Input
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                disabled={isUploading}
+                className="max-w-xs mx-auto"
+              />
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="grid grid-cols-2 gap-4">
@@ -253,7 +349,7 @@ export const InventoryForm = ({ setOpen }: InventoryFormProps) => {
         <Button type="button" variant="outline" onClick={() => setOpen(false)}>
           Cancel
         </Button>
-        <Button type="submit" disabled={createInventory.isPending}>
+        <Button type="submit" disabled={createInventory.isPending || isUploading}>
           {createInventory.isPending ? "Adding..." : "Add Product"}
         </Button>
       </div>

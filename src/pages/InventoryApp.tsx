@@ -51,9 +51,9 @@ const InventoryApp = () => {
   const contactInfo = {
     businessName: "Mahadev Enterprise",
     tagline: "Premium Water Filtration Systems & Solutions",
-    phone: "+91 98765 43210",
+    phone: "+91 9429466454",
     email: "info@mahadeventerprises.com",
-    address: "123 Industrial Area, Phase-2, Sector 45, Gurgaon, Haryana 122003",
+    address: "Jila Panchayat Road, Market Yard, Shop 123, Amreli",
     website: "www.mahadeventerprises.com"
   };
 
@@ -102,7 +102,7 @@ const InventoryApp = () => {
             </div>
             <div className="flex items-center gap-2 sm:gap-3 justify-center lg:justify-start">
               <MapPin className="h-4 w-4 sm:h-5 sm:w-5 text-primary flex-shrink-0" />
-              <span className="text-foreground text-sm sm:text-base">Gurgaon, Haryana</span>
+              <span className="text-foreground text-sm sm:text-base">Amreli, Gujarat</span>
             </div>
           </div>
           
@@ -143,13 +143,17 @@ const InventoryApp = () => {
             {inventory?.map((item) => (
               <Card key={item.id} className="hover:shadow-lg transition-shadow duration-200">
                 {/* Product Image */}
-                {item.image_url && (
+                {item.image_url ? (
                   <div className="aspect-square w-full overflow-hidden rounded-t-lg bg-gray-100">
                     <img
                       src={item.image_url}
                       alt={item.name}
                       className="w-full h-full object-cover"
                     />
+                  </div>
+                ) : (
+                  <div className="aspect-square w-full overflow-hidden rounded-t-lg bg-gray-100 flex items-center justify-center">
+                    <Package className="h-12 w-12 text-muted-foreground" />
                   </div>
                 )}
                 

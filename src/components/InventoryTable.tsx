@@ -21,7 +21,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Trash2, Edit } from "lucide-react";
+import { Trash2, Edit, Package } from "lucide-react";
 
 interface InventoryItem {
   id: string;
@@ -74,6 +74,7 @@ export const InventoryTable = ({ data, onDelete }: InventoryTableProps) => {
       <Table>
         <TableHeader>
           <TableRow>
+            <TableHead>Image</TableHead>
             <TableHead>Product ID</TableHead>
             <TableHead>Name</TableHead>
             <TableHead>Unit Price</TableHead>
@@ -87,6 +88,19 @@ export const InventoryTable = ({ data, onDelete }: InventoryTableProps) => {
         <TableBody>
           {data.map((item) => (
             <TableRow key={item.id}>
+              <TableCell>
+                {item.image_url ? (
+                  <img
+                    src={item.image_url}
+                    alt={item.name}
+                    className="w-12 h-12 object-cover rounded-md"
+                  />
+                ) : (
+                  <div className="w-12 h-12 bg-muted rounded-md flex items-center justify-center">
+                    <Package className="h-6 w-6 text-muted-foreground" />
+                  </div>
+                )}
+              </TableCell>
               <TableCell className="font-medium">{item.product_id}</TableCell>
               <TableCell>
                 <div>
@@ -146,7 +160,7 @@ export const InventoryTable = ({ data, onDelete }: InventoryTableProps) => {
           ))}
           {data.length === 0 && (
             <TableRow>
-              <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
+              <TableCell colSpan={9} className="text-center py-8 text-muted-foreground">
                 No products found. Add your first product to get started.
               </TableCell>
             </TableRow>
