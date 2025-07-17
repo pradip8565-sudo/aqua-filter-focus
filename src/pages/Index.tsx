@@ -6,15 +6,20 @@ import { SalesAnalytics } from "@/components/SalesAnalytics";
 import { SupplierManagement } from "@/components/SupplierManagement";
 import { BusinessOverview } from "@/components/BusinessOverview";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { ShopImageUpload } from "@/components/ShopImageUpload";
 import ProtectedRoute from "@/components/ProtectedRoute";
-import { Package, ExternalLink } from "lucide-react";
+import { Package, ExternalLink, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Link } from "react-router-dom";
+import { useState } from "react";
 
 const Index = () => {
   const { t } = useLanguage();
+  const [shopImageUrl, setShopImageUrl] = useState<string>("");
+  const [isShopSettingsOpen, setIsShopSettingsOpen] = useState(false);
 
   return (
     <ProtectedRoute>
@@ -26,6 +31,33 @@ const Index = () => {
               <p className="text-muted-foreground text-sm sm:text-base">Business Management System</p>
             </div>
             <div className="flex items-center gap-3 flex-wrap">
+              <Dialog open={isShopSettingsOpen} onOpenChange={setIsShopSettingsOpen}>
+                <DialogTrigger asChild>
+                  <Button variant="outline" size="sm" className="flex items-center gap-2">
+                    <Settings className="h-4 w-4" />
+                    <span className="hidden sm:inline">Shop Settings</span>
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-md">
+                  <DialogHeader>
+                    <DialogTitle>Shop Settings</DialogTitle>
+                    <DialogDescription>
+                      Upload or manage your shop image for the public catalog
+                    </DialogDescription>
+                  </DialogHeader>
+                  <ShopImageUpload
+                    currentImageUrl={shopImageUrl}
+                    onImageUploaded={(imageUrl) => {
+                      setShopImageUrl(imageUrl);
+                      setIsShopSettingsOpen(false);
+                    }}
+                    onImageRemoved={() => {
+                      setShopImageUrl("");
+                      setIsShopSettingsOpen(false);
+                    }}
+                  />
+                </DialogContent>
+              </Dialog>
               <Button variant="outline" size="sm" className="flex items-center gap-2">
                 <Package className="h-4 w-4" />
                 <span className="hidden sm:inline">{t('quick.order')}</span>

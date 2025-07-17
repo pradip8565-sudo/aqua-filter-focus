@@ -5,34 +5,22 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Phone, Mail, MapPin, Globe, Package, Star, LogIn, Settings } from "lucide-react";
+import { Search, Phone, Mail, MapPin, Globe, Package, LogIn } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { ShopImageUpload } from "@/components/ShopImageUpload";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 interface InventoryItem {
   id: string;
-  product_id: string;
   name: string;
   description?: string;
-  unit_price: number;
   selling_price: number;
-  stock_quantity: number;
-  minimum_stock: number;
-  unit?: string;
-  hsn_code?: string;
-  gst_rate?: number;
-  status?: string;
   categories?: { name: string };
-  suppliers?: { name: string };
   image_url?: string;
 }
 
 const InventoryApp = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [shopImageUrl, setShopImageUrl] = useState<string>("");
-  const [isShopSettingsOpen, setIsShopSettingsOpen] = useState(false);
 
   const { data: inventory, isLoading } = useQuery({
     queryKey: ['inventory-display', searchTerm],
@@ -40,15 +28,18 @@ const InventoryApp = () => {
       let query = supabase
         .from('inventory')
         .select(`
-          *,
-          categories (name),
-          suppliers (name)
+          id,
+          name,
+          description,
+          selling_price,
+          image_url,
+          categories (name)
         `)
         .eq('status', 'active')
         .order('created_at', { ascending: false });
 
       if (searchTerm) {
-        query = query.or(`name.ilike.%${searchTerm}%,product_id.ilike.%${searchTerm}%`);
+        query = query.or(`name.ilike.%${searchTerm}%`);
       }
 
       const { data, error } = await query;
@@ -56,12 +47,6 @@ const InventoryApp = () => {
       return data as InventoryItem[];
     }
   });
-
-  const getStockStatus = (current: number, minimum: number) => {
-    if (current === 0) return { label: "Out of Stock", color: "bg-red-100 text-red-800" };
-    if (current <= minimum) return { label: "Low Stock", color: "bg-yellow-100 text-yellow-800" };
-    return { label: "In Stock", color: "bg-green-100 text-green-800" };
-  };
 
   const contactInfo = {
     businessName: "Mahadev Enterprise",
@@ -92,33 +77,6 @@ const InventoryApp = () => {
               <p className="text-sm sm:text-lg text-muted-foreground mb-4">{contactInfo.tagline}</p>
             </div>
             <div className="flex gap-2 ml-4">
-              <Dialog open={isShopSettingsOpen} onOpenChange={setIsShopSettingsOpen}>
-                <DialogTrigger asChild>
-                  <Button variant="outline" size="sm" className="flex items-center gap-2">
-                    <Settings className="h-4 w-4" />
-                    <span className="hidden sm:inline">Shop Settings</span>
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="max-w-md">
-                  <DialogHeader>
-                    <DialogTitle>Shop Settings</DialogTitle>
-                    <DialogDescription>
-                      Upload or manage your shop image
-                    </DialogDescription>
-                  </DialogHeader>
-                  <ShopImageUpload
-                    currentImageUrl={shopImageUrl}
-                    onImageUploaded={(imageUrl) => {
-                      setShopImageUrl(imageUrl);
-                      setIsShopSettingsOpen(false);
-                    }}
-                    onImageRemoved={() => {
-                      setShopImageUrl("");
-                      setIsShopSettingsOpen(false);
-                    }}
-                  />
-                </DialogContent>
-              </Dialog>
               <Link to="/admin-login">
                 <Button variant="outline" size="sm" className="flex items-center gap-2">
                   <LogIn className="h-4 w-4" />
@@ -182,98 +140,46 @@ const InventoryApp = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
-            {inventory?.map((item) => {
-              const stockStatus = getStockStatus(item.stock_quantity, item.minimum_stock);
-              return (
-                <Card key={item.id} className="hover:shadow-lg transition-shadow duration-200">
-                  {/* Product Image */}
-                  {item.image_url && (
-                    <div className="aspect-square w-full overflow-hidden rounded-t-lg bg-gray-100">
-                      <img
-                        src={item.image_url}
-                        alt={item.name}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
+            {inventory?.map((item) => (
+              <Card key={item.id} className="hover:shadow-lg transition-shadow duration-200">
+                {/* Product Image */}
+                {item.image_url && (
+                  <div className="aspect-square w-full overflow-hidden rounded-t-lg bg-gray-100">
+                    <img
+                      src={item.image_url}
+                      alt={item.name}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                )}
+                
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base sm:text-lg line-clamp-2">{item.name}</CardTitle>
+                  {item.categories?.name && (
+                    <CardDescription className="text-sm">
+                      {item.categories.name}
+                    </CardDescription>
+                  )}
+                </CardHeader>
+                
+                <CardContent className="space-y-3 sm:space-y-4">
+                  {item.description && (
+                    <p className="text-sm text-muted-foreground line-clamp-3">
+                      {item.description}
+                    </p>
                   )}
                   
-                  <CardHeader className="pb-3">
-                    <div className="flex justify-between items-start mb-2 gap-2">
-                      <Badge variant="outline" className="text-xs flex-shrink-0">
-                        {item.product_id}
-                      </Badge>
-                      <Badge className={`text-xs ${stockStatus.color} flex-shrink-0`}>
-                        {stockStatus.label}
-                      </Badge>
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-muted-foreground">Price:</span>
+                      <span className="text-base sm:text-lg font-bold text-primary">
+                        ₹{item.selling_price.toLocaleString('en-IN')}
+                      </span>
                     </div>
-                    <CardTitle className="text-base sm:text-lg line-clamp-2">{item.name}</CardTitle>
-                    {item.categories?.name && (
-                      <CardDescription className="text-sm">
-                        {item.categories.name}
-                      </CardDescription>
-                    )}
-                  </CardHeader>
-                  
-                  <CardContent className="space-y-3 sm:space-y-4">
-                    {item.description && (
-                      <p className="text-sm text-muted-foreground line-clamp-3">
-                        {item.description}
-                      </p>
-                    )}
-                    
-                    <div className="space-y-2">
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm text-muted-foreground">Price:</span>
-                        <span className="text-base sm:text-lg font-bold text-primary">
-                          ₹{item.selling_price.toLocaleString('en-IN')}
-                        </span>
-                      </div>
-                      
-                      {item.unit_price !== item.selling_price && (
-                        <div className="flex justify-between items-center">
-                          <span className="text-sm text-muted-foreground">Cost:</span>
-                          <span className="text-sm text-muted-foreground">
-                            ₹{item.unit_price.toLocaleString('en-IN')}
-                          </span>
-                        </div>
-                      )}
-                      
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm text-muted-foreground">Stock:</span>
-                        <span className="text-sm font-medium">
-                          {item.stock_quantity} {item.unit}
-                        </span>
-                      </div>
-                      
-                      {item.hsn_code && (
-                        <div className="flex justify-between items-center">
-                          <span className="text-sm text-muted-foreground">HSN:</span>
-                          <span className="text-sm">{item.hsn_code}</span>
-                        </div>
-                      )}
-                      
-                      {item.gst_rate && (
-                        <div className="flex justify-between items-center">
-                          <span className="text-sm text-muted-foreground">GST:</span>
-                          <span className="text-sm">{item.gst_rate}%</span>
-                        </div>
-                      )}
-                    </div>
-                    
-                    {item.suppliers?.name && (
-                      <div className="pt-2 border-t">
-                        <div className="flex items-center gap-2">
-                          <Star className="h-4 w-4 text-yellow-500 flex-shrink-0" />
-                          <span className="text-sm text-muted-foreground truncate">
-                            Supplier: {item.suppliers.name}
-                          </span>
-                        </div>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              );
-            })}
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
           </div>
         )}
       </main>
