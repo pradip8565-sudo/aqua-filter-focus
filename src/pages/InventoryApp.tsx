@@ -1,12 +1,15 @@
+
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Phone, Mail, MapPin, Globe, Package, Star, LogIn } from "lucide-react";
+import { Search, Phone, Mail, MapPin, Globe, Package, Star, LogIn, Settings } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { ShopImageUpload } from "@/components/ShopImageUpload";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 interface InventoryItem {
   id: string;
@@ -28,6 +31,8 @@ interface InventoryItem {
 
 const InventoryApp = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [shopImageUrl, setShopImageUrl] = useState<string>("");
+  const [isShopSettingsOpen, setIsShopSettingsOpen] = useState(false);
 
   const { data: inventory, isLoading } = useQuery({
     queryKey: ['inventory-display', searchTerm],
@@ -74,15 +79,53 @@ const InventoryApp = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
           <div className="flex justify-between items-start mb-6">
             <div className="text-center flex-1">
+              {shopImageUrl && (
+                <div className="mb-4 flex justify-center">
+                  <img
+                    src={shopImageUrl}
+                    alt="Mahadev Enterprise"
+                    className="h-20 w-auto object-contain rounded-lg"
+                  />
+                </div>
+              )}
               <h1 className="text-2xl sm:text-4xl font-bold text-foreground mb-2">{contactInfo.businessName}</h1>
               <p className="text-sm sm:text-lg text-muted-foreground mb-4">{contactInfo.tagline}</p>
             </div>
-            <Link to="/admin-login" className="ml-4">
-              <Button variant="outline" size="sm" className="flex items-center gap-2">
-                <LogIn className="h-4 w-4" />
-                <span className="hidden sm:inline">Admin Login</span>
-              </Button>
-            </Link>
+            <div className="flex gap-2 ml-4">
+              <Dialog open={isShopSettingsOpen} onOpenChange={setIsShopSettingsOpen}>
+                <DialogTrigger asChild>
+                  <Button variant="outline" size="sm" className="flex items-center gap-2">
+                    <Settings className="h-4 w-4" />
+                    <span className="hidden sm:inline">Shop Settings</span>
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-md">
+                  <DialogHeader>
+                    <DialogTitle>Shop Settings</DialogTitle>
+                    <DialogDescription>
+                      Upload or manage your shop image
+                    </DialogDescription>
+                  </DialogHeader>
+                  <ShopImageUpload
+                    currentImageUrl={shopImageUrl}
+                    onImageUploaded={(imageUrl) => {
+                      setShopImageUrl(imageUrl);
+                      setIsShopSettingsOpen(false);
+                    }}
+                    onImageRemoved={() => {
+                      setShopImageUrl("");
+                      setIsShopSettingsOpen(false);
+                    }}
+                  />
+                </DialogContent>
+              </Dialog>
+              <Link to="/admin-login">
+                <Button variant="outline" size="sm" className="flex items-center gap-2">
+                  <LogIn className="h-4 w-4" />
+                  <span className="hidden sm:inline">Admin Login</span>
+                </Button>
+              </Link>
+            </div>
           </div>
           
           {/* Contact Information */}
