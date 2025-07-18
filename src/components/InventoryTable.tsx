@@ -59,52 +59,52 @@ export const InventoryTable = ({ data, onDelete }: InventoryTableProps) => {
   const getStatusBadge = (status?: string) => {
     switch (status) {
       case 'active':
-        return <Badge variant="default">Active</Badge>;
+        return <Badge variant="default" className="bg-green-100 text-green-800 hover:bg-green-100">active</Badge>;
       case 'inactive':
-        return <Badge variant="secondary">Inactive</Badge>;
+        return <Badge variant="secondary">inactive</Badge>;
       case 'discontinued':
-        return <Badge variant="destructive">Discontinued</Badge>;
+        return <Badge variant="destructive">discontinued</Badge>;
       default:
-        return <Badge variant="outline">Unknown</Badge>;
+        return <Badge variant="outline">unknown</Badge>;
     }
   };
 
   return (
-    <div className="rounded-md border">
+    <div className="w-full">
       <Table>
         <TableHeader>
-          <TableRow>
-            <TableHead>Image</TableHead>
-            <TableHead>Product ID</TableHead>
-            <TableHead>Name</TableHead>
-            <TableHead>Unit Price</TableHead>
-            <TableHead>Selling Price</TableHead>
-            <TableHead>Stock</TableHead>
-            <TableHead>Min Stock</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
+          <TableRow className="border-b border-border">
+            <TableHead className="text-muted-foreground font-medium">Image</TableHead>
+            <TableHead className="text-muted-foreground font-medium">Product ID</TableHead>
+            <TableHead className="text-muted-foreground font-medium">Name</TableHead>
+            <TableHead className="text-muted-foreground font-medium">Unit Price</TableHead>
+            <TableHead className="text-muted-foreground font-medium">Selling Price</TableHead>
+            <TableHead className="text-muted-foreground font-medium">Stock</TableHead>
+            <TableHead className="text-muted-foreground font-medium">Min Stock</TableHead>
+            <TableHead className="text-muted-foreground font-medium">Status</TableHead>
+            <TableHead className="text-muted-foreground font-medium text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {data.map((item) => (
-            <TableRow key={item.id}>
-              <TableCell>
+            <TableRow key={item.id} className="border-b border-border/50 hover:bg-muted/50">
+              <TableCell className="py-4">
                 {item.image_url ? (
                   <img
                     src={item.image_url}
                     alt={item.name}
-                    className="w-12 h-12 object-cover rounded-md"
+                    className="w-10 h-10 object-cover rounded-md"
                   />
                 ) : (
-                  <div className="w-12 h-12 bg-muted rounded-md flex items-center justify-center">
-                    <Package className="h-6 w-6 text-muted-foreground" />
+                  <div className="w-10 h-10 bg-muted rounded-md flex items-center justify-center">
+                    <Package className="h-5 w-5 text-muted-foreground" />
                   </div>
                 )}
               </TableCell>
-              <TableCell className="font-medium">{item.product_id}</TableCell>
-              <TableCell>
+              <TableCell className="py-4 font-medium text-foreground">{item.product_id}</TableCell>
+              <TableCell className="py-4">
                 <div>
-                  <div className="font-medium">{item.name}</div>
+                  <div className="font-medium text-foreground">{item.name}</div>
                   {item.description && (
                     <div className="text-sm text-muted-foreground truncate max-w-xs">
                       {item.description}
@@ -112,26 +112,26 @@ export const InventoryTable = ({ data, onDelete }: InventoryTableProps) => {
                   )}
                 </div>
               </TableCell>
-              <TableCell>₹{item.unit_price.toFixed(2)}</TableCell>
-              <TableCell>₹{item.selling_price.toFixed(2)}</TableCell>
-              <TableCell>
+              <TableCell className="py-4 text-foreground">₹{item.unit_price.toFixed(2)}</TableCell>
+              <TableCell className="py-4 text-foreground">₹{item.selling_price.toFixed(2)}</TableCell>
+              <TableCell className="py-4">
                 <div className="flex items-center gap-2">
-                  <span>{item.stock_quantity}</span>
+                  <span className="text-foreground">{item.stock_quantity}</span>
                   {item.stock_quantity <= item.minimum_stock && (
                     <Badge variant="destructive" className="text-xs">Low</Badge>
                   )}
                 </div>
               </TableCell>
-              <TableCell>{item.minimum_stock}</TableCell>
-              <TableCell>{getStatusBadge(item.status)}</TableCell>
-              <TableCell className="text-right">
+              <TableCell className="py-4 text-foreground">{item.minimum_stock}</TableCell>
+              <TableCell className="py-4">{getStatusBadge(item.status)}</TableCell>
+              <TableCell className="py-4 text-right">
                 <div className="flex items-center justify-end gap-2">
-                  <Button variant="outline" size="sm">
+                  <Button variant="outline" size="sm" className="h-8 w-8 p-0">
                     <Edit className="h-4 w-4" />
                   </Button>
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
-                      <Button variant="outline" size="sm" className="text-destructive">
+                      <Button variant="outline" size="sm" className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50">
                         <Trash2 className="h-4 w-4" />
                       </Button>
                     </AlertDialogTrigger>
@@ -160,7 +160,7 @@ export const InventoryTable = ({ data, onDelete }: InventoryTableProps) => {
           ))}
           {data.length === 0 && (
             <TableRow>
-              <TableCell colSpan={9} className="text-center py-8 text-muted-foreground">
+              <TableCell colSpan={9} className="text-center py-12 text-muted-foreground">
                 No products found. Add your first product to get started.
               </TableCell>
             </TableRow>

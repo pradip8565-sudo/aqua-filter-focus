@@ -87,13 +87,29 @@ const InventoryDashboard = () => {
   const filteredInventory = inventory || [];
 
   return (
-    <div>
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-bold">Inventory Dashboard</h2>
+    <div className="p-6 space-y-6">
+      {/* Header Section */}
+      <div className="flex flex-col space-y-2">
+        <h1 className="text-2xl font-bold text-foreground">Inventory Management</h1>
+        <p className="text-muted-foreground">Manage your product inventory</p>
+      </div>
+
+      {/* Search and Add Section */}
+      <div className="flex items-center justify-between gap-4">
+        <div className="relative flex-1 max-w-md">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search products..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10"
+          />
+        </div>
+        
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button>
-              <PlusCircle className="h-4 w-4 mr-2" />
+            <Button className="flex items-center gap-2">
+              <PlusCircle className="h-4 w-4" />
               Add Product
             </Button>
           </DialogTrigger>
@@ -109,25 +125,16 @@ const InventoryDashboard = () => {
         </Dialog>
       </div>
 
-      <div className="mb-4">
-        <div className="relative max-w-md">
-          <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Search products by name, ID, or description..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10"
-          />
-        </div>
+      {/* Table Section */}
+      <div className="bg-card rounded-lg border">
+        {isLoading ? (
+          <div className="flex justify-center items-center py-12">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          </div>
+        ) : (
+          <InventoryTable data={filteredInventory} onDelete={deleteInventory} />
+        )}
       </div>
-
-      {isLoading ? (
-        <div className="flex justify-center items-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-        </div>
-      ) : (
-        <InventoryTable data={filteredInventory} onDelete={deleteInventory} />
-      )}
     </div>
   );
 };
