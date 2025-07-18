@@ -88,41 +88,45 @@ const InventoryDashboard = () => {
 
   return (
     <div className="p-6 space-y-6">
-      {/* Header Section */}
-      <div className="flex flex-col space-y-2">
-        <h1 className="text-2xl font-bold text-foreground">Inventory Management</h1>
-        <p className="text-muted-foreground">Manage your product inventory</p>
+      {/* Header Section with Border */}
+      <div className="border border-border rounded-lg p-6 bg-card">
+        <div className="flex flex-col space-y-2">
+          <h1 className="text-2xl font-bold text-foreground">Inventory Management</h1>
+          <p className="text-muted-foreground">Manage your product inventory</p>
+        </div>
       </div>
 
-      {/* Search and Add Section */}
-      <div className="flex items-center justify-between gap-4">
-        <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Search products..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10"
-          />
+      {/* Search and Add Section with Border */}
+      <div className="border border-border rounded-lg p-4 bg-card">
+        <div className="flex items-center justify-between gap-4">
+          <div className="relative flex-1 max-w-md">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search products..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10 border-input"
+            />
+          </div>
+          
+          <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+              <Button className="flex items-center gap-2">
+                <PlusCircle className="h-4 w-4" />
+                Add Product
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>Add New Product</DialogTitle>
+                <DialogDescription>
+                  Create a new product in your inventory.
+                </DialogDescription>
+              </DialogHeader>
+              <InventoryForm setOpen={setOpen} />
+            </DialogContent>
+          </Dialog>
         </div>
-        
-        <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger asChild>
-            <Button className="flex items-center gap-2">
-              <PlusCircle className="h-4 w-4" />
-              Add Product
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>Add New Product</DialogTitle>
-              <DialogDescription>
-                Create a new product in your inventory.
-              </DialogDescription>
-            </DialogHeader>
-            <InventoryForm setOpen={setOpen} />
-          </DialogContent>
-        </Dialog>
       </div>
 
       {/* Table Section */}
