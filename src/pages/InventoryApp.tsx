@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Search, Phone, Mail, MapPin, Globe, Package, LogIn } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { toast } from "sonner";
 
 interface InventoryItem {
   id: string;
@@ -47,6 +48,17 @@ const InventoryApp = () => {
       return data as InventoryItem[];
     }
   });
+
+  const handleQuickOrder = (item: InventoryItem) => {
+    // Create WhatsApp message with product details
+    const message = `Hi! I'm interested in ordering:\n\nProduct: ${item.name}\nPrice: ₹${item.selling_price.toLocaleString('en-IN')}\n\nPlease let me know about availability and delivery details.`;
+    const encodedMessage = encodeURIComponent(message);
+    const whatsappUrl = `https://wa.me/919429466454?text=${encodedMessage}`;
+    
+    // Open WhatsApp in a new window
+    window.open(whatsappUrl, '_blank');
+    toast.success("Opening WhatsApp to place your order!");
+  };
 
   const contactInfo = {
     businessName: "Mahadev Enterprise",
@@ -180,6 +192,13 @@ const InventoryApp = () => {
                         ₹{item.selling_price.toLocaleString('en-IN')}
                       </span>
                     </div>
+                    <Button 
+                      onClick={() => handleQuickOrder(item)}
+                      className="w-full"
+                      size="sm"
+                    >
+                      Quick Order via WhatsApp
+                    </Button>
                   </div>
                 </CardContent>
               </Card>
@@ -215,7 +234,7 @@ const InventoryApp = () => {
             </div>
             <div className="mt-6 pt-6 border-t">
               <p className="text-sm text-muted-foreground">
-                © 2024 {contactInfo.businessName}. All rights reserved.
+                © 2025 {contactInfo.businessName}. All rights reserved.
               </p>
             </div>
           </div>
