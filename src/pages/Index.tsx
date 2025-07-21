@@ -6,6 +6,7 @@ import { SalesAnalytics } from "@/components/SalesAnalytics";
 import { SupplierManagement } from "@/components/SupplierManagement";
 import { BusinessOverview } from "@/components/BusinessOverview";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import LogoutButton from "@/components/LogoutButton";
 import { ShopImageUpload } from "@/components/ShopImageUpload";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { Package, ExternalLink, Settings } from "lucide-react";
@@ -71,6 +72,7 @@ const Index = () => {
                 </Button>
               </Link>
               <LanguageSwitcher />
+              <LogoutButton />
             </div>
           </div>
         </header>
