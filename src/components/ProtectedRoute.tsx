@@ -49,18 +49,6 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="border-b bg-card px-4 py-2">
-        <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <div>
-            <span className="text-sm text-muted-foreground">Logged in as: </span>
-            <span className="text-sm font-medium">Admin</span>
-          </div>
-          <Button variant="outline" size="sm" onClick={handleLogout}>
-            <LogOut className="h-4 w-4 mr-2" />
-            Logout
-          </Button>
-        </div>
-      </div>
       {children}
     </div>
   );
