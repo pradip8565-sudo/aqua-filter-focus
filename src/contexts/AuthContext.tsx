@@ -14,14 +14,18 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const useAuth = () => {
+  console.log('useAuth called');
   const context = useContext(AuthContext);
+  console.log('AuthContext value:', context);
   if (context === undefined) {
+    console.error('useAuth called outside of AuthProvider');
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
 };
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+  console.log('AuthProvider rendering...');
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
